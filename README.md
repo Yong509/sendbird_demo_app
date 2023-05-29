@@ -1,6 +1,6 @@
 # sendbird_demo_app
 
-A new Flutter project.
+## Sendbird + Dash chat
 
 ## Getting Started
 
