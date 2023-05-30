@@ -3,6 +3,8 @@ import 'package:sendbird_demo_app/services/sendbird_service.dart';
 import 'package:sendbird_demo_app/widgets/private_group_channel/selected_users_bottom_sheet.dart';
 import 'package:sendbird_sdk/sendbird_sdk.dart';
 
+import '../chat_page/chat_page.dart';
+
 class PrivateGroupChannelPage extends StatefulWidget {
   const PrivateGroupChannelPage({super.key});
 
@@ -63,7 +65,16 @@ class _PrivateGroupChannelPageState extends State<PrivateGroupChannelPage> {
                   ),
                   trailing: IconButton(
                     icon: const Icon(Icons.message_rounded),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChatPage(
+                            groupChannel: snapshot.data![index],
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 );
               },

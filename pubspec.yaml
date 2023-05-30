@@ -36,7 +36,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   sendbird_sdk: ^3.2.12
-  dash_chat: ^1.1.16
+  dash_chat_2: ^0.0.17
   flutter_dotenv: ^5.0.2
 
 dev_dependencies:

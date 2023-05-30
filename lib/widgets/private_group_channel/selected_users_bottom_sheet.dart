@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:sendbird_demo_app/pages/chat_page/chat_page.dart';
 import 'package:sendbird_demo_app/services/sendbird_service.dart';
 import 'package:sendbird_sdk/sendbird_sdk.dart';
 
@@ -26,7 +25,7 @@ class SelectedUsersBottomSheet {
                   Column(
                     children: [
                       Text(
-                        "Select user to create room",
+                        "Select who you want to chat with",
                         style: Theme.of(context).textTheme.headlineSmall,
                       ),
                       ListView.builder(
@@ -34,39 +33,47 @@ class SelectedUsersBottomSheet {
                         shrinkWrap: true,
                         itemCount: availableUsers.length,
                         itemBuilder: (context, index) {
-                          return CheckboxListTile(
-                            title: Text(availableUsers[index].nickname),
-                            activeColor: Theme.of(context).primaryColor,
-                            controlAffinity: ListTileControlAffinity.platform,
-                            onChanged: (value) {
-                              setState(() {
-                                if (value == true) {
-                                  _selectedUsers.add(availableUsers[index]);
-                                } else {
-                                  _selectedUsers.remove(availableUsers[index]);
-                                }
-                              });
-                              print(_selectedUsers.map((e) => e.nickname));
-                            },
-                            value:
-                                _selectedUsers.contains(availableUsers[index]),
-                            secondary: availableUsers[index].profileUrl!.isEmpty
-                                ? CircleAvatar(
-                                    child: Text(
-                                    (availableUsers[index].nickname.isEmpty
-                                            ? availableUsers[index].userId
-                                            : availableUsers[index].nickname)
-                                        .substring(0, 1)
-                                        .toUpperCase(),
-                                  ))
-                                : CircleAvatar(
-                                    backgroundImage: NetworkImage(
-                                      availableUsers[index]
-                                          .profileUrl
-                                          .toString(),
+                          if (availableUsers[index].userId !=
+                              SendBirdService().user.userId) {
+                            return CheckboxListTile(
+                              title: Text(availableUsers[index].nickname),
+                              activeColor: Theme.of(context).primaryColor,
+                              controlAffinity: ListTileControlAffinity.platform,
+                              onChanged: (value) {
+                                setState(() {
+                                  if (value == true) {
+                                    _selectedUsers.add(availableUsers[index]);
+                                  } else {
+                                    _selectedUsers
+                                        .remove(availableUsers[index]);
+                                  }
+                                });
+                                print(_selectedUsers.map((e) => e.nickname));
+                              },
+                              value: _selectedUsers
+                                  .contains(availableUsers[index]),
+                              secondary: availableUsers[index]
+                                      .profileUrl!
+                                      .isEmpty
+                                  ? CircleAvatar(
+                                      child: Text(
+                                      (availableUsers[index].nickname.isEmpty
+                                              ? availableUsers[index].userId
+                                              : availableUsers[index].nickname)
+                                          .substring(0, 1)
+                                          .toUpperCase(),
+                                    ))
+                                  : CircleAvatar(
+                                      backgroundImage: NetworkImage(
+                                        availableUsers[index]
+                                            .profileUrl
+                                            .toString(),
+                                      ),
                                     ),
-                                  ),
-                          );
+                            );
+                          } else {
+                            return const SizedBox();
+                          }
                         },
                       ),
                     ],
@@ -78,7 +85,11 @@ class SelectedUsersBottomSheet {
                       SendBirdService().createChannel([
                         for (final user in _selectedUsers) user.userId
                       ]).then(
-                        (value) => print(value.members),
+                        (value) => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => ChatPage(groupChannel: value),
+                          ),
+                        ),
                       );
                     },
                     child: const Text("Create"),
