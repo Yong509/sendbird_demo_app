@@ -9,8 +9,7 @@ class SendBirdService {
 
   Future<User> sendbirdConnect() async {
     try {
-      final sendbird =
-          SendbirdSdk(appId: "3A40D3AC-5D48-4B40-BC2D-3C22D512B59C");
+      final sendbird = SendbirdSdk(appId: dotenv.get("SENDBIRD_APPID"));
       user = await sendbird.connect("yong12345");
       return user;
     } catch (error) {
@@ -44,7 +43,9 @@ class SendBirdService {
 
   Future<GroupChannel> createChannel(List<String> userIds) async {
     try {
-      final params = GroupChannelParams()..userIds = userIds;
+      final params = GroupChannelParams()
+        ..userIds = userIds
+        ..name = "Yong test chat room";
       final channel = await GroupChannel.createChannel(params);
       return channel;
     } catch (e) {

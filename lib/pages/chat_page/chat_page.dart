@@ -17,6 +17,7 @@ class _ChatPageState extends State<ChatPage> with ChannelEventHandler {
   @override
   void initState() {
     super.initState();
+    widget.groupChannel.markAsRead();
     getMessages(widget.groupChannel);
     SendbirdSdk().addChannelEventHandler(widget.groupChannel.channelUrl, this);
   }
@@ -29,6 +30,7 @@ class _ChatPageState extends State<ChatPage> with ChannelEventHandler {
 
   @override
   onMessageReceived(channel, message) {
+    widget.groupChannel.markAsRead();
     setState(() {
       _messages.add(message);
     });
@@ -44,6 +46,12 @@ class _ChatPageState extends State<ChatPage> with ChannelEventHandler {
     } catch (e) {
       print('group_channel_view.dart: getMessages: ERROR: $e');
     }
+  }
+
+  @override
+  void onReadReceiptUpdated(GroupChannel channel) {
+    super.onReadReceiptUpdated(channel);
+    final readMembers = widget.groupChannel.getReadMembers(_messages.last);
   }
 
   @override
@@ -77,6 +85,7 @@ class _ChatPageState extends State<ChatPage> with ChannelEventHandler {
         key: Key(widget.groupChannel.channelUrl),
         currentUser: user,
         onSend: (ChatMessage message) {
+          widget.groupChannel.markAsRead();
           var sentMessage =
               widget.groupChannel.sendUserMessageWithText(message.text);
           setState(() {

@@ -58,12 +58,23 @@ class _MyHomePageState extends State<MyHomePage> {
               style: Theme.of(context).textTheme.headlineMedium,
             ),
             const SizedBox(height: 20),
-            CircleAvatar(
-              radius: 80,
-              backgroundImage: NetworkImage(
-                SendBirdService().user.profileUrl.toString(),
-              ),
-            ),
+            SendBirdService().user.profileUrl!.isEmpty
+                ? CircleAvatar(
+                    radius: 80,
+                    child: Text(
+                      (SendBirdService().user.nickname.isEmpty
+                              ? SendBirdService().user.userId
+                              : SendBirdService().user.nickname)
+                          .substring(0, 1)
+                          .toUpperCase(),
+                      style: const TextStyle(fontSize: 80),
+                    ))
+                : CircleAvatar(
+                    radius: 80,
+                    backgroundImage: NetworkImage(
+                      SendBirdService().user.profileUrl.toString(),
+                    ),
+                  ),
             const SizedBox(height: 20),
             Text(
               SendBirdService().user.nickname,
