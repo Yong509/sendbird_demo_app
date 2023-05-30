@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:sendbird_demo_app/pages/private_group_channel/private_group_channel_page.dart';
 import 'package:sendbird_demo_app/services/sendbird_service.dart';
 import 'package:sendbird_sdk/core/models/user.dart';
+import 'package:sendbird_sdk/sendbird_sdk.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -67,6 +69,16 @@ class _MyHomePageState extends State<MyHomePage> {
               SendBirdService().user.nickname,
               style: Theme.of(context).textTheme.headlineLarge,
             ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                      builder: (context) => const PrivateGroupChannelPage()),
+                );
+              },
+              child: const Text("LET'S CHAT"),
+            )
           ],
         ),
       ),
