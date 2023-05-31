@@ -1,8 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.sendbird_demo_app">
+    package="com.example.sendbird.demo.app">
    <application
-        android:label="sendbird_demo_app"
-        android:name="${applicationName}"
+        android:label="io.flutter.app.SendbirdDemoApp"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

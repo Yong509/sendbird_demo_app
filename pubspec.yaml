@@ -38,6 +38,7 @@ dependencies:
   sendbird_sdk: ^3.2.12
   dash_chat_2: ^0.0.17
   flutter_dotenv: ^5.0.2
+  intl: ^0.18.1
 
 dev_dependencies:
   flutter_test:

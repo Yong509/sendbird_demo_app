@@ -1,6 +1,9 @@
 import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:sendbird_demo_app/services/sendbird_service.dart';
+import 'package:sendbird_demo_app/widgets/chat_page/chat_row.dart';
+import 'package:sendbird_demo_app/widgets/chat_page/message_bubble.dart';
 import 'package:sendbird_sdk/core/channel/group/group_channel.dart';
 import 'package:sendbird_sdk/sendbird_sdk.dart';
 
@@ -14,6 +17,8 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> with ChannelEventHandler {
   List<BaseMessage> _messages = [];
+  List<Member> readMembers = [];
+  Map<BaseMessage, List<Member>> tempReadMembers = {};
   @override
   void initState() {
     super.initState();
@@ -42,6 +47,17 @@ class _ChatPageState extends State<ChatPage> with ChannelEventHandler {
           DateTime.now().millisecondsSinceEpoch * 1000, MessageListParams());
       setState(() {
         _messages = messages;
+        for (final message in _messages) {
+          tempReadMembers[message] = [];
+        }
+
+        tempReadMembers.forEach((key, value) {
+          final read = channel.getReadMembers(key);
+
+          if (read.isNotEmpty) {
+            tempReadMembers[key] = read;
+          }
+        });
       });
     } catch (e) {
       print('group_channel_view.dart: getMessages: ERROR: $e');
@@ -51,27 +67,66 @@ class _ChatPageState extends State<ChatPage> with ChannelEventHandler {
   @override
   void onReadReceiptUpdated(GroupChannel channel) {
     super.onReadReceiptUpdated(channel);
-    final readMembers = widget.groupChannel.getReadMembers(_messages.last);
+    getMessages(channel);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Column(
+        backgroundColor: Colors.white,
+        leading: IconButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            icon: const Icon(
+              Icons.chevron_left,
+              color: Color(0XFF1AC5B9),
+              size: 35,
+            )),
+        title: Row(
           children: [
-            Text(
-              widget.groupChannel.name.toString(),
+            widget.groupChannel.name!.isNotEmpty
+                ? CircleAvatar(
+                    radius: 16,
+                    backgroundColor: const Color(0XFFBDBDBD),
+                    child: Text(
+                      (widget.groupChannel.name!.isEmpty
+                              ? ''
+                              : widget.groupChannel.name.toString())
+                          .substring(0, 1)
+                          .toUpperCase(),
+                      style: const TextStyle(fontSize: 15, color: Colors.white),
+                    ),
+                  )
+                : CircleAvatar(
+                    radius: 16,
+                    backgroundImage:
+                        NetworkImage(widget.groupChannel.coverUrl.toString()),
+                  ),
+            const SizedBox(
+              width: 20,
             ),
             Text(
-              [
-                for (final member in widget.groupChannel.members)
-                  member.nickname
-              ].join(","),
-              overflow: TextOverflow.ellipsis,
+              widget.groupChannel.name.toString(),
+              style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
             ),
           ],
         ),
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(
+              Icons.info_outline_rounded,
+              color: Color(0XFF1AC5B9),
+              size: 30,
+            ),
+          )
+        ],
       ),
       body: body(context),
     );
@@ -80,7 +135,7 @@ class _ChatPageState extends State<ChatPage> with ChannelEventHandler {
   Widget body(BuildContext context) {
     ChatUser user = dashChatUserWidget(SendbirdSdk().currentUser!);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(8, 8, 8, 40),
+      padding: const EdgeInsets.fromLTRB(8, 8, 8, 20),
       child: DashChat(
         key: Key(widget.groupChannel.channelUrl),
         currentUser: user,
@@ -94,11 +149,31 @@ class _ChatPageState extends State<ChatPage> with ChannelEventHandler {
         },
         messages: dashChatMessage(_messages),
         inputOptions: InputOptions(
-          leading: [IconButton(onPressed: () {}, icon: const Icon(Icons.add))],
+          leading: [
+            Padding(
+              padding: const EdgeInsets.only(right: 18.0),
+              child: IconButton(
+                  onPressed: () {},
+                  icon: const Icon(
+                    Icons.add_box_sharp,
+                    color: Color(0XFF1AC5B9),
+                    size: 36,
+                  )),
+            )
+          ],
           sendOnEnter: true,
           inputDecoration: const InputDecoration(
-              hintText: "Enter messages",
-              border: OutlineInputBorder(borderSide: BorderSide())),
+            hintText: "Enter messages",
+            filled: true,
+            fillColor: Color(0XFFEEEEEE),
+            contentPadding: EdgeInsets.only(left: 20),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.all(
+                Radius.circular(30),
+              ),
+              borderSide: BorderSide.none,
+            ),
+          ),
         ),
         messageOptions: MessageOptions(
           showCurrentUserAvatar: true,
@@ -109,6 +184,16 @@ class _ChatPageState extends State<ChatPage> with ChannelEventHandler {
               color: message.user.id == SendBirdService().user.userId
                   ? Theme.of(context).primaryColor
                   : Colors.grey[200], // example
+            );
+          },
+          messageRowBuilder: (message, previousMessage, nextMessage,
+              isAfterDateSeparator, isBeforeDateSeparator) {
+            final currentUser =
+                message.user.id == SendBirdService().user.userId;
+            return ChatRow(
+              message: message,
+              currentUser: currentUser,
+              tempReadMembers: tempReadMembers,
             );
           },
         ),
