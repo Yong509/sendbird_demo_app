@@ -5,6 +5,7 @@ import 'package:sendbird_demo_app/services/sendbird_service.dart';
 import 'package:sendbird_demo_app/widgets/chat_page/chat_message_row.dart';
 import 'package:sendbird_demo_app/widgets/chat_page/date_seperator.dart';
 import 'package:sendbird_demo_app/widgets/chat_page/message_bubble.dart';
+import 'package:sendbird_demo_app/widgets/chat_page/upload_picture_bottom_sheet.dart';
 import 'package:sendbird_sdk/core/channel/group/group_channel.dart';
 import 'package:sendbird_sdk/sendbird_sdk.dart';
 
@@ -156,6 +157,7 @@ class _ChatPageState extends State<ChatPage> with ChannelEventHandler {
             widget.groupChannel.markAsRead();
             var sentMessage =
                 widget.groupChannel.sendUserMessageWithText(message.text);
+
             setState(() {
               _messages.add(sentMessage);
             });
@@ -166,7 +168,24 @@ class _ChatPageState extends State<ChatPage> with ChannelEventHandler {
               Padding(
                 padding: const EdgeInsets.only(right: 18.0),
                 child: IconButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      final image =
+                          await UploadPictureBottomSheet(context: context)
+                              .showUploadBottomSheet();
+
+                      widget.groupChannel
+                          .sendFileMessage(FileMessageParams.withFile(image!),
+                              onCompleted: (message, error) {
+                        getMessages(widget.groupChannel).then((value) =>
+                            WidgetsBinding.instance.addPostFrameCallback(
+                              (_) => scrollController.animateTo(
+                                scrollController.position.maxScrollExtent,
+                                duration: const Duration(milliseconds: 150),
+                                curve: Curves.easeIn,
+                              ),
+                            ));
+                      });
+                    },
                     icon: const Icon(
                       Icons.add_box_sharp,
                       color: Color(0XFF1AC5B9),

@@ -2,6 +2,7 @@ import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:sendbird_demo_app/services/sendbird_service.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MessageBubble extends StatelessWidget {
   final ChatMessage message;
@@ -40,12 +41,19 @@ class MessageBubble extends StatelessWidget {
                         scale: 5,
                       )
                     : Text("invalid url")
-                : Text(
-                    message.text,
-                    textAlign: currentUser ? TextAlign.end : TextAlign.start,
-                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                : InkWell(
+                    onTap: Uri.parse(message.text).isAbsolute
+                        ? () => launchUrl(Uri.parse(message.text))
+                        : null,
+                    child: Text(
+                      message.text,
+                      textAlign: currentUser ? TextAlign.end : TextAlign.start,
+                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                           color: currentUser ? Colors.white : Colors.black,
-                        ),
+                          decoration: Uri.parse(message.text).isAbsolute
+                              ? TextDecoration.underline
+                              : null),
+                    ),
                   ),
           ),
         ],

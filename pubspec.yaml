@@ -39,6 +39,8 @@ dependencies:
   dash_chat_2: ^0.0.17
   flutter_dotenv: ^5.0.2
   intl: ^0.18.1
+  image_picker: ^0.8.7+5
+  url_launcher: ^6.1.11
 
 dev_dependencies:
   flutter_test:
