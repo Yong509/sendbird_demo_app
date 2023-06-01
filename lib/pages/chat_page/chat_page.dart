@@ -39,6 +39,14 @@ class _ChatPageState extends State<ChatPage> with ChannelEventHandler {
   @override
   onMessageReceived(channel, message) {
     widget.groupChannel.markAsRead();
+    if (message is AdminMessage) {
+      print("admin message");
+    } else if (message is FileMessage) {
+      final instance = SendbirdSdk().getInternal();
+      final ekey = instance.sessionManager.getEKey();
+
+      print("${message.toJson()['url']}?auth=$ekey");
+    }
     setState(() {
       _messages.add(message);
     });
@@ -206,11 +214,17 @@ class _ChatPageState extends State<ChatPage> with ChannelEventHandler {
                 isAfterDateSeparator, isBeforeDateSeparator) {
               final currentUser =
                   message.user.id == SendBirdService().user.userId;
-              return ChatMessageRow(
-                message: message,
-                currentUser: currentUser,
-                tempReadMembers: tempReadMembers,
-              );
+              if (message is FileMessage) {
+                final instance = SendbirdSdk().getInternal();
+                final ekey = instance.sessionManager.getEKey();
+                return Image.network("${message.toJson()['url']}?auth=$ekey");
+              } else {
+                return ChatMessageRow(
+                  message: message,
+                  currentUser: currentUser,
+                  tempReadMembers: tempReadMembers,
+                );
+              }
             },
           ),
         ),
