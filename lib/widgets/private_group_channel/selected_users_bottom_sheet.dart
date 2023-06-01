@@ -95,11 +95,15 @@ class SelectedUsersBottomSheet {
                       SendBirdService().createChannel([
                         for (final user in _selectedUsers) user.userId
                       ]).then(
-                        (value) => Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => ChatPage(groupChannel: value),
-                          ),
-                        ),
+                        (value) {
+                          Navigator.pop(context);
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  ChatPage(groupChannel: value),
+                            ),
+                          );
+                        },
                       );
                     },
                     child: const Text("Create"),

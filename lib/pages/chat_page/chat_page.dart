@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:sendbird_demo_app/services/sendbird_service.dart';
 import 'package:sendbird_demo_app/widgets/chat_page/chat_message_row.dart';
+import 'package:sendbird_demo_app/widgets/chat_page/date_seperator.dart';
 import 'package:sendbird_demo_app/widgets/chat_page/message_bubble.dart';
 import 'package:sendbird_sdk/core/channel/group/group_channel.dart';
 import 'package:sendbird_sdk/sendbird_sdk.dart';
@@ -174,6 +175,9 @@ class _ChatPageState extends State<ChatPage> with ChannelEventHandler {
               borderSide: BorderSide.none,
             ),
           ),
+        ),
+        messageListOptions: MessageListOptions(
+          dateSeparatorBuilder: (date) => DateSeperator(date: date),
         ),
         messageOptions: MessageOptions(
           showCurrentUserAvatar: true,

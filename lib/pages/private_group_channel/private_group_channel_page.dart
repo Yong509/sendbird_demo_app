@@ -82,11 +82,14 @@ class _PrivateGroupChannelPageState extends State<PrivateGroupChannelPage> {
           },
         ),
       ),
-      floatingActionButton: FloatingActionButton(onPressed: () {
-        SelectedUsersBottomSheet(
-                context: context, availableUsers: _availableUsers)
-            .showSelectedUserBottomSheet();
-      }),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          SelectedUsersBottomSheet(
+                  context: context, availableUsers: _availableUsers)
+              .showSelectedUserBottomSheet();
+        },
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }
