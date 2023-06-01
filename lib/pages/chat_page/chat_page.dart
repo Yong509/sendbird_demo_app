@@ -2,7 +2,7 @@ import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:sendbird_demo_app/services/sendbird_service.dart';
-import 'package:sendbird_demo_app/widgets/chat_page/chat_row.dart';
+import 'package:sendbird_demo_app/widgets/chat_page/chat_message_row.dart';
 import 'package:sendbird_demo_app/widgets/chat_page/message_bubble.dart';
 import 'package:sendbird_sdk/core/channel/group/group_channel.dart';
 import 'package:sendbird_sdk/sendbird_sdk.dart';
@@ -190,7 +190,7 @@ class _ChatPageState extends State<ChatPage> with ChannelEventHandler {
               isAfterDateSeparator, isBeforeDateSeparator) {
             final currentUser =
                 message.user.id == SendBirdService().user.userId;
-            return ChatRow(
+            return ChatMessageRow(
               message: message,
               currentUser: currentUser,
               tempReadMembers: tempReadMembers,

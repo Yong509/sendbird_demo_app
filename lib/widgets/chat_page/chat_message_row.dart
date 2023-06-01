@@ -3,24 +3,23 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:sendbird_demo_app/services/sendbird_service.dart';
 import 'package:sendbird_demo_app/widgets/chat_page/message_bubble.dart';
-import 'package:sendbird_sdk/core/message/base_message.dart';
 import 'package:sendbird_sdk/sendbird_sdk.dart';
 
-class ChatRow extends StatefulWidget {
+class ChatMessageRow extends StatefulWidget {
   final ChatMessage message;
   final bool currentUser;
   final Map<BaseMessage, List<Member>> tempReadMembers;
-  const ChatRow(
+  const ChatMessageRow(
       {super.key,
       required this.message,
       required this.currentUser,
       required this.tempReadMembers});
 
   @override
-  State<ChatRow> createState() => _ChatRowState();
+  State<ChatMessageRow> createState() => _ChatMessageRowState();
 }
 
-class _ChatRowState extends State<ChatRow> {
+class _ChatMessageRowState extends State<ChatMessageRow> {
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -31,21 +30,21 @@ class _ChatRowState extends State<ChatRow> {
             widget.message.user.id != SendBirdService().user.userId
                 ? MainAxisAlignment.start
                 : MainAxisAlignment.end,
-        children: [
-          widget.currentUser
-              ? _buildMessageCreateTime(context, widget.message)
-              : const SizedBox(),
-          buildCircleAvatar(message: widget.message),
-          const SizedBox(
-            width: 10,
-          ),
-          MessageBubble(message: widget.message),
-          widget.currentUser
-              ? const SizedBox()
-              : _buildMessageCreateTime(context, widget.message)
-        ],
+        children:
+            widget.currentUser ? _buildChat().reversed.toList() : _buildChat(),
       ),
     );
+  }
+
+  List<Widget> _buildChat() {
+    return [
+      buildCircleAvatar(message: widget.message),
+      const SizedBox(
+        width: 10,
+      ),
+      MessageBubble(message: widget.message),
+      _buildMessageCreateTime(context, widget.message)
+    ];
   }
 
   Widget buildCircleAvatar({required ChatMessage message}) {
