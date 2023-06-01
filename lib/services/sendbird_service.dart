@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:sendbird_sdk/sendbird_sdk.dart';
 
@@ -10,7 +11,7 @@ class SendBirdService {
   Future<User> sendbirdConnect() async {
     try {
       final sendbird = SendbirdSdk(appId: dotenv.get("SENDBIRD_APPID"));
-      user = await sendbird.connect("yong12345");
+      user = await sendbird.connect("testUser");
       return user;
     } catch (error) {
       rethrow;

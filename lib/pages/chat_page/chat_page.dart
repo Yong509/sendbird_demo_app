@@ -20,10 +20,13 @@ class _ChatPageState extends State<ChatPage> with ChannelEventHandler {
   List<BaseMessage> _messages = [];
   List<Member> readMembers = [];
   Map<BaseMessage, List<Member>> tempReadMembers = {};
+  late ScrollController scrollController;
   @override
   void initState() {
     super.initState();
     widget.groupChannel.markAsRead();
+    scrollController = ScrollController();
+
     getMessages(widget.groupChannel);
     SendbirdSdk().addChannelEventHandler(widget.groupChannel.channelUrl, this);
   }
@@ -73,6 +76,13 @@ class _ChatPageState extends State<ChatPage> with ChannelEventHandler {
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => scrollController.animateTo(
+        scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 150),
+        curve: Curves.easeIn,
+      ),
+    );
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -135,71 +145,76 @@ class _ChatPageState extends State<ChatPage> with ChannelEventHandler {
 
   Widget body(BuildContext context) {
     ChatUser user = dashChatUserWidget(SendbirdSdk().currentUser!);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(8, 8, 8, 20),
-      child: DashChat(
-        key: Key(widget.groupChannel.channelUrl),
-        currentUser: user,
-        onSend: (ChatMessage message) {
-          widget.groupChannel.markAsRead();
-          var sentMessage =
-              widget.groupChannel.sendUserMessageWithText(message.text);
-          setState(() {
-            _messages.add(sentMessage);
-          });
-        },
-        messages: dashChatMessage(_messages),
-        inputOptions: InputOptions(
-          leading: [
-            Padding(
-              padding: const EdgeInsets.only(right: 18.0),
-              child: IconButton(
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.add_box_sharp,
-                    color: Color(0XFF1AC5B9),
-                    size: 36,
-                  )),
-            )
-          ],
-          sendOnEnter: true,
-          inputDecoration: const InputDecoration(
-            hintText: "Enter messages",
-            filled: true,
-            fillColor: Color(0XFFEEEEEE),
-            contentPadding: EdgeInsets.only(left: 20),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(30),
+    return SingleChildScrollView(
+      physics: const ScrollPhysics(parent: NeverScrollableScrollPhysics()),
+      child: Container(
+        height: MediaQuery.of(context).size.height * (91 / 100),
+        padding: const EdgeInsets.fromLTRB(8, 8, 8, 20),
+        child: DashChat(
+          key: Key(widget.groupChannel.channelUrl),
+          currentUser: user,
+          onSend: (ChatMessage message) {
+            widget.groupChannel.markAsRead();
+            var sentMessage =
+                widget.groupChannel.sendUserMessageWithText(message.text);
+            setState(() {
+              _messages.add(sentMessage);
+            });
+          },
+          messages: dashChatMessage(_messages),
+          inputOptions: InputOptions(
+            leading: [
+              Padding(
+                padding: const EdgeInsets.only(right: 18.0),
+                child: IconButton(
+                    onPressed: () {},
+                    icon: const Icon(
+                      Icons.add_box_sharp,
+                      color: Color(0XFF1AC5B9),
+                      size: 36,
+                    )),
+              )
+            ],
+            sendOnEnter: true,
+            inputDecoration: const InputDecoration(
+              hintText: "Enter messages",
+              filled: true,
+              fillColor: Color(0XFFEEEEEE),
+              contentPadding: EdgeInsets.only(left: 20),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(30),
+                ),
+                borderSide: BorderSide.none,
               ),
-              borderSide: BorderSide.none,
             ),
           ),
-        ),
-        messageListOptions: MessageListOptions(
-          dateSeparatorBuilder: (date) => DateSeperator(date: date),
-        ),
-        messageOptions: MessageOptions(
-          showCurrentUserAvatar: true,
-          showOtherUsersAvatar: true,
-          messageDecorationBuilder: (message, previousMessage, nextMessage) {
-            return BoxDecoration(
-              borderRadius: const BorderRadius.all(Radius.circular(20.0)),
-              color: message.user.id == SendBirdService().user.userId
-                  ? Theme.of(context).primaryColor
-                  : Colors.grey[200], // example
-            );
-          },
-          messageRowBuilder: (message, previousMessage, nextMessage,
-              isAfterDateSeparator, isBeforeDateSeparator) {
-            final currentUser =
-                message.user.id == SendBirdService().user.userId;
-            return ChatMessageRow(
-              message: message,
-              currentUser: currentUser,
-              tempReadMembers: tempReadMembers,
-            );
-          },
+          messageListOptions: MessageListOptions(
+            scrollController: scrollController,
+            // dateSeparatorBuilder: (date) => DateSeperator(date: date),
+          ),
+          messageOptions: MessageOptions(
+            showCurrentUserAvatar: true,
+            showOtherUsersAvatar: true,
+            messageDecorationBuilder: (message, previousMessage, nextMessage) {
+              return BoxDecoration(
+                borderRadius: const BorderRadius.all(Radius.circular(20.0)),
+                color: message.user.id == SendBirdService().user.userId
+                    ? Theme.of(context).primaryColor
+                    : Colors.grey[200], // example
+              );
+            },
+            messageRowBuilder: (message, previousMessage, nextMessage,
+                isAfterDateSeparator, isBeforeDateSeparator) {
+              final currentUser =
+                  message.user.id == SendBirdService().user.userId;
+              return ChatMessageRow(
+                message: message,
+                currentUser: currentUser,
+                tempReadMembers: tempReadMembers,
+              );
+            },
+          ),
         ),
       ),
     );
