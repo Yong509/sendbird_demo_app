@@ -26,7 +26,6 @@ class _ChatPageState extends State<ChatPage> with ChannelEventHandler {
     super.initState();
     widget.groupChannel.markAsRead();
     scrollController = ScrollController();
-
     getMessages(widget.groupChannel);
     SendbirdSdk().addChannelEventHandler(widget.groupChannel.channelUrl, this);
   }
@@ -54,7 +53,6 @@ class _ChatPageState extends State<ChatPage> with ChannelEventHandler {
         for (final message in _messages) {
           tempReadMembers[message] = [];
         }
-
         tempReadMembers.forEach((key, value) {
           final read = channel.getReadMembers(key);
 
@@ -148,8 +146,8 @@ class _ChatPageState extends State<ChatPage> with ChannelEventHandler {
     return SingleChildScrollView(
       physics: const ScrollPhysics(parent: NeverScrollableScrollPhysics()),
       child: Container(
-        height: MediaQuery.of(context).size.height * (91 / 100),
-        padding: const EdgeInsets.fromLTRB(8, 8, 8, 20),
+        height: MediaQuery.of(context).size.height * (85 / 100),
+        padding: const EdgeInsets.fromLTRB(8, 28, 8, 20),
         child: DashChat(
           key: Key(widget.groupChannel.channelUrl),
           currentUser: user,
@@ -191,7 +189,7 @@ class _ChatPageState extends State<ChatPage> with ChannelEventHandler {
           ),
           messageListOptions: MessageListOptions(
             scrollController: scrollController,
-            // dateSeparatorBuilder: (date) => DateSeperator(date: date),
+            dateSeparatorBuilder: (date) => DateSeperator(date: date),
           ),
           messageOptions: MessageOptions(
             showCurrentUserAvatar: true,
