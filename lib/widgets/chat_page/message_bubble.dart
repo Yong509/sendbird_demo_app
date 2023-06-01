@@ -5,7 +5,8 @@ import 'package:sendbird_demo_app/services/sendbird_service.dart';
 
 class MessageBubble extends StatelessWidget {
   final ChatMessage message;
-  const MessageBubble({super.key, required this.message});
+  final ChatMedia? media;
+  const MessageBubble({super.key, required this.message, this.media});
 
   @override
   Widget build(BuildContext context) {
@@ -32,13 +33,20 @@ class MessageBubble extends StatelessWidget {
                   : const Color(0XFFEEEEEE),
               borderRadius: BorderRadius.circular(30),
             ),
-            child: Text(
-              message.text,
-              textAlign: currentUser ? TextAlign.end : TextAlign.start,
-              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    color: currentUser ? Colors.white : Colors.black,
+            child: media != null
+                ? Uri.parse(media!.url).isAbsolute
+                    ? Image.network(
+                        media!.url,
+                        scale: 5,
+                      )
+                    : Text("invalid url")
+                : Text(
+                    message.text,
+                    textAlign: currentUser ? TextAlign.end : TextAlign.start,
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                          color: currentUser ? Colors.white : Colors.black,
+                        ),
                   ),
-            ),
           ),
         ],
       ),

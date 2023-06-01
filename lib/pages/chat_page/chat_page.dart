@@ -39,14 +39,7 @@ class _ChatPageState extends State<ChatPage> with ChannelEventHandler {
   @override
   onMessageReceived(channel, message) {
     widget.groupChannel.markAsRead();
-    if (message is AdminMessage) {
-      print("admin message");
-    } else if (message is FileMessage) {
-      final instance = SendbirdSdk().getInternal();
-      final ekey = instance.sessionManager.getEKey();
 
-      print("${message.toJson()['url']}?auth=$ekey");
-    }
     setState(() {
       _messages.add(message);
     });
@@ -155,7 +148,7 @@ class _ChatPageState extends State<ChatPage> with ChannelEventHandler {
       physics: const ScrollPhysics(parent: NeverScrollableScrollPhysics()),
       child: Container(
         height: MediaQuery.of(context).size.height * (85 / 100),
-        padding: const EdgeInsets.fromLTRB(8, 28, 8, 20),
+        padding: const EdgeInsets.fromLTRB(8, 18, 8, 14),
         child: DashChat(
           key: Key(widget.groupChannel.channelUrl),
           currentUser: user,
@@ -214,17 +207,21 @@ class _ChatPageState extends State<ChatPage> with ChannelEventHandler {
                 isAfterDateSeparator, isBeforeDateSeparator) {
               final currentUser =
                   message.user.id == SendBirdService().user.userId;
-              if (message is FileMessage) {
-                final instance = SendbirdSdk().getInternal();
-                final ekey = instance.sessionManager.getEKey();
-                return Image.network("${message.toJson()['url']}?auth=$ekey");
-              } else {
-                return ChatMessageRow(
-                  message: message,
-                  currentUser: currentUser,
-                  tempReadMembers: tempReadMembers,
-                );
+              if (message.medias != null) {
+                for (final media in message.medias!) {
+                  return ChatMessageRow(
+                      chatMedia: media,
+                      message: message,
+                      currentUser: currentUser,
+                      tempReadMembers: tempReadMembers);
+                }
               }
+
+              return ChatMessageRow(
+                message: message,
+                currentUser: currentUser,
+                tempReadMembers: tempReadMembers,
+              );
             },
           ),
         ),
@@ -234,12 +231,24 @@ class _ChatPageState extends State<ChatPage> with ChannelEventHandler {
 
   List<ChatMessage> dashChatMessage(List<BaseMessage> messages) {
     List<ChatMessage> result = [];
+    final instance = SendbirdSdk().getInternal();
+    final ekey = instance.sessionManager.getEKey();
     for (var message in messages) {
       Sender user = message.sender!;
+
       result.add(
         ChatMessage(
           createdAt: DateTime.fromMillisecondsSinceEpoch(message.createdAt),
           text: message.message,
+          medias: message.toJson()['url'] != null
+              ? [
+                  ChatMedia(
+                    url: "${message.toJson()['url']}?auth=$ekey",
+                    fileName: "${message.toJson()['url']}?auth=$ekey",
+                    type: MediaType.image,
+                  )
+                ]
+              : null,
           user: dashChatUserWidget(user),
         ),
       );

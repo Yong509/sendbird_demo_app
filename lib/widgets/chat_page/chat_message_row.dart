@@ -9,11 +9,13 @@ class ChatMessageRow extends StatefulWidget {
   final ChatMessage message;
   final bool currentUser;
   final Map<BaseMessage, List<Member>> tempReadMembers;
+  final ChatMedia? chatMedia;
   const ChatMessageRow(
       {super.key,
       required this.message,
       required this.currentUser,
-      required this.tempReadMembers});
+      required this.tempReadMembers,
+      this.chatMedia});
 
   @override
   State<ChatMessageRow> createState() => _ChatMessageRowState();
@@ -42,7 +44,12 @@ class _ChatMessageRowState extends State<ChatMessageRow> {
       const SizedBox(
         width: 10,
       ),
-      MessageBubble(message: widget.message),
+      widget.chatMedia != null
+          ? MessageBubble(
+              message: widget.message,
+              media: widget.chatMedia,
+            )
+          : MessageBubble(message: widget.message),
       _buildMessageCreateTime(context, widget.message)
     ];
   }

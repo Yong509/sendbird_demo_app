@@ -11,7 +11,7 @@ class SendBirdService {
   Future<User> sendbirdConnect() async {
     try {
       final sendbird = SendbirdSdk(appId: dotenv.get("SENDBIRD_APPID"));
-      user = await sendbird.connect("driver");
+      user = await sendbird.connect("testUser");
       return user;
     } catch (error) {
       rethrow;
