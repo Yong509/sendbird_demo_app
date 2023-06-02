@@ -40,7 +40,6 @@ class _ChatPageState extends State<ChatPage> with ChannelEventHandler {
   @override
   onMessageReceived(channel, message) {
     widget.groupChannel.markAsRead();
-
     setState(() {
       _messages.add(message);
     });
@@ -78,8 +77,8 @@ class _ChatPageState extends State<ChatPage> with ChannelEventHandler {
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback(
       (_) => scrollController.animateTo(
-        scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 150),
+        scrollController.position.minScrollExtent,
+        duration: const Duration(milliseconds: 120),
         curve: Curves.easeIn,
       ),
     );
@@ -162,35 +161,40 @@ class _ChatPageState extends State<ChatPage> with ChannelEventHandler {
               _messages.add(sentMessage);
             });
           },
-          messages: dashChatMessage(_messages),
+          messages: dashChatMessage(_messages.reversed.toList()),
           inputOptions: InputOptions(
             leading: [
               Padding(
                 padding: const EdgeInsets.only(right: 18.0),
                 child: IconButton(
-                    onPressed: () async {
-                      final image =
-                          await UploadPictureBottomSheet(context: context)
-                              .showUploadBottomSheet();
-
-                      widget.groupChannel
-                          .sendFileMessage(FileMessageParams.withFile(image!),
-                              onCompleted: (message, error) {
-                        getMessages(widget.groupChannel).then((value) =>
-                            WidgetsBinding.instance.addPostFrameCallback(
+                  onPressed: () async {
+                    final image =
+                        await UploadPictureBottomSheet(context: context)
+                            .showUploadBottomSheet();
+                    if (image != null) {
+                      widget.groupChannel.sendFileMessage(
+                        FileMessageParams.withFile(image),
+                        onCompleted: (message, error) {
+                          getMessages(widget.groupChannel).then(
+                            (value) =>
+                                WidgetsBinding.instance.addPostFrameCallback(
                               (_) => scrollController.animateTo(
                                 scrollController.position.maxScrollExtent,
                                 duration: const Duration(milliseconds: 150),
                                 curve: Curves.easeIn,
                               ),
-                            ));
-                      });
-                    },
-                    icon: const Icon(
-                      Icons.add_box_sharp,
-                      color: Color(0XFF1AC5B9),
-                      size: 36,
-                    )),
+                            ),
+                          );
+                        },
+                      );
+                    }
+                  },
+                  icon: const Icon(
+                    Icons.add_box_sharp,
+                    color: Color(0XFF1AC5B9),
+                    size: 36,
+                  ),
+                ),
               )
             ],
             sendOnEnter: true,
@@ -208,6 +212,8 @@ class _ChatPageState extends State<ChatPage> with ChannelEventHandler {
             ),
           ),
           messageListOptions: MessageListOptions(
+            scrollPhysics: const BouncingScrollPhysics(),
+            separatorFrequency: SeparatorFrequency.days,
             scrollController: scrollController,
             dateSeparatorBuilder: (date) => DateSeperator(date: date),
           ),
@@ -235,7 +241,6 @@ class _ChatPageState extends State<ChatPage> with ChannelEventHandler {
                       tempReadMembers: tempReadMembers);
                 }
               }
-
               return ChatMessageRow(
                 message: message,
                 currentUser: currentUser,

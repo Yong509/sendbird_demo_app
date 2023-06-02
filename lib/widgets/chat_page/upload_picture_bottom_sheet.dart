@@ -10,7 +10,7 @@ class UploadPictureBottomSheet {
   const UploadPictureBottomSheet({required this.context});
 
   Future<File?> showUploadBottomSheet() async {
-    late final File? image;
+    File? image;
     await showCupertinoModalPopup(
       context: context,
       builder: (BuildContext context) => CupertinoActionSheet(
@@ -33,6 +33,10 @@ class UploadPictureBottomSheet {
         ],
       ),
     );
-    return image;
+    if (image == null) {
+      return null;
+    } else {
+      return image;
+    }
   }
 }
