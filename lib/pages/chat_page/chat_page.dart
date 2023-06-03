@@ -175,14 +175,14 @@ class _ChatPageState extends State<ChatPage> with ChannelEventHandler {
                       widget.groupChannel.sendFileMessage(
                         FileMessageParams.withFile(image),
                         onCompleted: (message, error) {
-                          getMessages(widget.groupChannel).then(
-                            (value) =>
-                                WidgetsBinding.instance.addPostFrameCallback(
-                              (_) => scrollController.animateTo(
-                                scrollController.position.maxScrollExtent,
-                                duration: const Duration(milliseconds: 150),
-                                curve: Curves.easeIn,
-                              ),
+                          setState(() {
+                            _messages.add(message);
+                          });
+                          WidgetsBinding.instance.addPostFrameCallback(
+                            (_) => scrollController.animateTo(
+                              scrollController.position.maxScrollExtent,
+                              duration: const Duration(milliseconds: 150),
+                              curve: Curves.easeIn,
                             ),
                           );
                         },
