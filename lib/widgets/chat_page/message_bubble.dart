@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -12,8 +13,10 @@ class MessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currentUser = message.user.id == SendBirdService().user.userId;
+    final columnKey = GlobalKey();
     return Flexible(
       child: Column(
+        key: columnKey,
         crossAxisAlignment:
             currentUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
@@ -36,11 +39,16 @@ class MessageBubble extends StatelessWidget {
             ),
             child: media != null
                 ? Uri.parse(media!.url).isAbsolute
-                    ? Image.network(
-                        media!.url,
-                        scale: 5,
-                      )
-                    : Text("invalid url")
+                    ? CachedNetworkImage(
+                        imageUrl: media!.url,
+                        placeholder: (context, url) => const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator()),
+                        errorWidget: (context, url, error) {
+                          return Text("Cannot load $url");
+                        })
+                    : const Text("invalid url")
                 : InkWell(
                     onTap: Uri.parse(message.text).isAbsolute
                         ? () => launchUrl(Uri.parse(message.text))
