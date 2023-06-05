@@ -29,8 +29,16 @@ class MessageBubble extends StatelessWidget {
                       ),
                 ),
           Container(
-            margin: const EdgeInsets.symmetric(vertical: 10),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            margin: media != null
+                ? Uri.parse(media!.url).isAbsolute
+                    ? EdgeInsets.zero
+                    : const EdgeInsets.symmetric(vertical: 10)
+                : const EdgeInsets.symmetric(vertical: 10),
+            padding: media != null
+                ? Uri.parse(media!.url).isAbsolute
+                    ? EdgeInsets.zero
+                    : const EdgeInsets.symmetric(vertical: 10, horizontal: 12)
+                : const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
             decoration: BoxDecoration(
               color: currentUser
                   ? const Color(0XFF1AC5B9)
@@ -39,15 +47,19 @@ class MessageBubble extends StatelessWidget {
             ),
             child: media != null
                 ? Uri.parse(media!.url).isAbsolute
-                    ? CachedNetworkImage(
-                        imageUrl: media!.url,
-                        placeholder: (context, url) => const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator()),
-                        errorWidget: (context, url, error) {
-                          return Text("Cannot load $url");
-                        },
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(15),
+                        child: CachedNetworkImage(
+                          imageUrl: media!.url,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator()),
+                          errorWidget: (context, url, error) {
+                            return Text("Cannot load $url");
+                          },
+                        ),
                       )
                     : const Text("invalid url")
                 : InkWell(
