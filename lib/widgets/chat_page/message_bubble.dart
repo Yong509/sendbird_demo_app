@@ -47,14 +47,17 @@ class MessageBubble extends StatelessWidget {
                             child: CircularProgressIndicator()),
                         errorWidget: (context, url, error) {
                           return Text("Cannot load $url");
-                        })
+                        },
+                      )
                     : const Text("invalid url")
                 : InkWell(
                     onTap: Uri.parse(message.text).isAbsolute
                         ? () => launchUrl(Uri.parse(message.text))
                         : null,
-                    child: Text(
+                    child: SelectableText(
                       message.text,
+                      showCursor: true,
+                      scrollPhysics: const ClampingScrollPhysics(),
                       textAlign: currentUser ? TextAlign.end : TextAlign.start,
                       style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                           color: currentUser ? Colors.white : Colors.black,
