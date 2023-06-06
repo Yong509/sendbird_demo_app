@@ -43,6 +43,7 @@ dependencies:
   dash_chat_2: ^0.0.17
   cached_network_image: ^3.2.3
   flutter_exif_rotation: ^0.5.1
+  easy_image_viewer: ^1.2.0
 
 dev_dependencies:
   flutter_test:
